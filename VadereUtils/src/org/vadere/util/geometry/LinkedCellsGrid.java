@@ -260,8 +260,41 @@ public class LinkedCellsGrid<T extends PointPositioned> implements Iterable<T> {
 				}
 			}
 		}
+		if (result.isEmpty() == true)
+			System.out.println("Empty");
+		//System.out.println(result);
 		return result;
 	}
+
+	public synchronized List<T> getObjectsTest(final VPoint pos, final double radius) {
+		final List<T> result = new LinkedList<T>();
+
+		int[] gridPos = gridPos(pos);
+		int[] discreteRad = new int[2];
+		discreteRad[0] = (int) Math.ceil(radius / cellSize[0]);
+		discreteRad[1] = (int) Math.ceil(radius / cellSize[1]);
+
+		final int maxRow = Math.min(gridSize[0] - 1, gridPos[0] + discreteRad[0]);
+		final int maxCol = Math.min(gridSize[1] - 1, gridPos[1] + discreteRad[1]);
+
+		for (int row = Math.max(0, gridPos[0] - discreteRad[0]); row <= maxRow; row++) {
+			for (int col = Math.max(0, gridPos[1] - discreteRad[1]); col <= maxCol; col++) {
+
+				for (T object : grid[row][col].objects) {
+					// if the given position is closer than the radius, add all objects stored there
+					double d = object.getPosition().distance(pos);
+					if (object.getPosition().distance(pos) < radius) {
+
+						result.add(object);
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
+
 
 	/**
 	 * Removes the objects equal to the given object from the grid regardless of

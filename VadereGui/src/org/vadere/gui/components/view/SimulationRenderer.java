@@ -301,7 +301,9 @@ public abstract class SimulationRenderer extends DefaultRenderer {
 
     public Color getPedestrianColor(@NotNull final Agent agent) {
 	    int targetId = agent.hasNextTarget() ? agent.getNextTargetId() : -1;
-
+        if (agent instanceof Pedestrian) {
+            return model.getGroupColor((Pedestrian)agent);
+        }
 	    switch (model.config.getAgentColoring()) {
 		    case TARGET:
 		        return model.config.getColorByTargetId(targetId).orElseGet(model.config::getPedestrianDefaultColor);

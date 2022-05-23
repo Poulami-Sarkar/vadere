@@ -9,6 +9,7 @@ import org.vadere.simulator.models.DynamicElementFactory;
 import org.vadere.simulator.models.MainModel;
 import org.vadere.simulator.models.Model;
 import org.vadere.simulator.models.bhm.BehaviouralHeuristicsModel;
+import org.vadere.simulator.models.groups.sir.SIRGroupModel;
 import org.vadere.simulator.models.osm.PedestrianOSM;
 import org.vadere.simulator.models.potential.PotentialFieldModel;
 import org.vadere.simulator.models.potential.fields.IPotentialField;
@@ -469,6 +470,7 @@ public class Simulation implements ControllerProvider{
 
 
 	private void updateLocomotionLayer(double simTimeInSec) {
+		double simTimeStepLength = attributesSimulation.getSimTimeStepLength();
 		for (Model m : models) {
 			List<SourceController> stillSpawningSource = this.sourceControllers.stream().filter(s -> !s.isSourceFinished(simTimeInSec)).collect(Collectors.toList());
 			int pedestriansInSimulation = this.simulationState.getTopography().getPedestrianDynamicElements().getElements().size();
@@ -476,6 +478,9 @@ public class Simulation implements ControllerProvider{
 
 			// Only update until there are pedestrians in the scenario or pedestrian to spawn or aerosol clouds persist
 			if (!stillSpawningSource.isEmpty() || pedestriansInSimulation > 0 || aerosolCloudsInSimulation > 0) {
+				if (m.getClass() == SIRGroupModel.class) {
+					((SIRGroupModel)m).setSimTimeStepLength(simTimeStepLength);
+				}
 				m.update(simTimeInSec);
 
 				if (topography.isRecomputeCells()) {
